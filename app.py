@@ -119,7 +119,7 @@ today_bs = nepali_date.today()
 # ---------------------------------------------------
 # INPUT CARD
 # ---------------------------------------------------
-st.markdown('<div class="card">', unsafe_allow_html=True)
+# st.markdown('<div class="card">', unsafe_allow_html=True)
 
 st.subheader("Loan Details")
 
@@ -301,7 +301,7 @@ if st.button("🧮 Calculate Interest"):
         days
     )
 
-    st.markdown('<div class="card">', unsafe_allow_html=True)
+    # st.markdown('<div class="card">', unsafe_allow_html=True)
 
     st.subheader("📊 Result")
 
