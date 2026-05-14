@@ -107,7 +107,7 @@ st.markdown(
 )
 
 st.markdown(
-    '<div class="sub-text">Nepal village-style yearly compounding interest calculator</div>',
+    '<div class="sub-text">नेपालमा प्रचलित गाउँघरको वार्षिक compounding ब्याज प्रणाली</div>',
     unsafe_allow_html=True
 )
 
@@ -124,14 +124,14 @@ st.markdown('<div class="card">', unsafe_allow_html=True)
 st.subheader("Loan Details")
 
 principal = st.number_input(
-    "Principal Amount",
+    "Principal Amount (मूल रकम)",
     min_value=0.0,
     value=80000.0,
     step=1000.0
 )
 
 rate = st.number_input(
-    "Monthly Interest Rate (%)",
+    "Monthly Interest Rate (मासिक ब्याज दर %)",
     min_value=0.0,
     value=3.0,
     step=0.5
@@ -171,7 +171,7 @@ current_col1, current_col2, current_col3 = st.columns(3)
 
 with current_col1:
     current_year = st.number_input(
-        "Current Year",
+        "Current Year (वर्ष)",
         min_value=2000,
         max_value=2090,
         value=today_bs.year
@@ -179,7 +179,7 @@ with current_col1:
 
 with current_col2:
     current_month = st.number_input(
-        "Current Month",
+        "Current Month (महिना)",
         min_value=1,
         max_value=12,
         value=today_bs.month
@@ -187,7 +187,7 @@ with current_col2:
 
 with current_col3:
     current_day = st.number_input(
-        "Current Day",
+        "Current Day (दिन)",
         min_value=1,
         max_value=32,
         value=today_bs.day
@@ -307,21 +307,21 @@ if st.button("🧮 Calculate Interest"):
 
     st.markdown(f"""
     <div class="metric-card">
-        <div class="metric-label">Main Principal Amount</div>
+        <div class="metric-label">Principal Amount (मूल रकम)</div>
         <div class="metric-value">रु. {principal:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown(f"""
     <div class="metric-card">
-        <div class="metric-label">Interest</div>
+        <div class="metric-label">Interest (ब्याज)</div>
         <div class="metric-value">रु. {result['interest']:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
 
     st.markdown(f"""
     <div class="metric-card">
-        <div class="metric-label">Total Amount</div>
+        <div class="metric-label">Total Amount (कुल रकम)</div>
         <div class="metric-value">रु. {result['total']:,.2f}</div>
     </div>
     """, unsafe_allow_html=True)
