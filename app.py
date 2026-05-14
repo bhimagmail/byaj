@@ -1,5 +1,4 @@
 import streamlit as st
-from datetime import datetime
 from nepali_datetime import date as nepali_date
 
 # ---------------------------------------------------
@@ -44,17 +43,18 @@ st.markdown("""
 # TITLE
 # ---------------------------------------------------
 st.title("💰 Village Interest Calculator")
+
 st.write(
-    "नेपालमा प्रचलित गाउँघरको वार्षिक compounding ब्याज प्रणाली अनुसार हिसाब"
+    "नेपालमा प्रचलित गाउँघरको वार्षिक compounding ब्याज प्रणाली"
 )
 
 # ---------------------------------------------------
-# CURRENT NEPALI DATE
+# CURRENT BS DATE
 # ---------------------------------------------------
 today_bs = nepali_date.today()
 
 # ---------------------------------------------------
-# USER INPUTS
+# INPUTS
 # ---------------------------------------------------
 principal = st.number_input(
     "मूल रकम (Principal Amount)",
@@ -70,45 +70,70 @@ rate = st.number_input(
     step=0.5
 )
 
+# ---------------------------------------------------
+# LOAN DATE
+# ---------------------------------------------------
 st.subheader("📅 Loan Date (BS)")
 
-col1, col2, col3 = st.columns(3)
+loan_col1, loan_col2, loan_col3 = st.columns(3)
 
-with col1:
+with loan_col1:
     loan_year = st.number_input(
-        "Year",
+        "Loan Year",
         min_value=2000,
         max_value=2090,
-        value=today_bs.year - 2
+        value=today_bs.year - 1
     )
 
-with col2:
+with loan_col2:
     loan_month = st.number_input(
-        "Month",
+        "Loan Month",
         min_value=1,
         max_value=12,
         value=today_bs.month
     )
 
-with col3:
+with loan_col3:
     loan_day = st.number_input(
-        "Day",
+        "Loan Day",
         min_value=1,
         max_value=32,
         value=today_bs.day
     )
 
 # ---------------------------------------------------
-# CURRENT DATE DISPLAY
+# CURRENT DATE
 # ---------------------------------------------------
-st.subheader("📍 Current Nepali Date")
+st.subheader("📍 Current Date (BS)")
 
-st.info(
-    f"{today_bs.year}-{today_bs.month:02d}-{today_bs.day:02d}"
-)
+current_col1, current_col2, current_col3 = st.columns(3)
+
+with current_col1:
+    current_year = st.number_input(
+        "Current Year",
+        min_value=2000,
+        max_value=2090,
+        value=today_bs.year
+    )
+
+with current_col2:
+    current_month = st.number_input(
+        "Current Month",
+        min_value=1,
+        max_value=12,
+        value=today_bs.month
+    )
+
+with current_col3:
+    current_day = st.number_input(
+        "Current Day",
+        min_value=1,
+        max_value=32,
+        value=today_bs.day
+    )
 
 # ---------------------------------------------------
-# CALCULATE TIME DIFFERENCE
+# CALCULATE DATE DIFFERENCE
 # ---------------------------------------------------
 try:
 
@@ -118,40 +143,54 @@ try:
         int(loan_day)
     )
 
-    # Convert to AD for subtraction
-    loan_ad = loan_date_bs.to_datetime_date()
-    today_ad = today_bs.to_datetime_date()
+    current_date_bs = nepali_date(
+        int(current_year),
+        int(current_month),
+        int(current_day)
+    )
 
-    total_days = (today_ad - loan_ad).days
+    loan_ad = loan_date_bs.to_datetime_date()
+    current_ad = current_date_bs.to_datetime_date()
+
+    total_days = (current_ad - loan_ad).days
+
+    if total_days < 0:
+        st.error("Current date must be after loan date")
+        st.stop()
 
     years = total_days // 365
+
     remaining_days = total_days % 365
 
     months = remaining_days // 30
+
     days = remaining_days % 30
 
+    # SHOW ONLY AFTER DATE SELECTION
     st.success(
-        f"⏳ Time Duration: {years} year(s), "
-        f"{months} month(s), {days} day(s)"
+        f"⏳ Time Duration: "
+        f"{years} year(s), "
+        f"{months} month(s), "
+        f"{days} day(s)"
     )
 
-except Exception as e:
-    st.error("Invalid Loan Date")
+except:
+    st.error("Invalid Date")
     st.stop()
 
 # ---------------------------------------------------
 # INTEREST LOGIC
 # ---------------------------------------------------
-def calculate_village_interest(principal, rate, years, months, days):
+def calculate_village_interest(
+    principal,
+    rate,
+    years,
+    months,
+    days
+):
 
-    yearly_details = []
-
-    original_principal = principal
-
-    # -------------------------
     # YEARLY COMPOUNDING
-    # -------------------------
-    for year in range(1, years + 1):
+    for _ in range(years):
 
         yearly_interest = (
             principal * 12 * rate
@@ -159,29 +198,17 @@ def calculate_village_interest(principal, rate, years, months, days):
 
         principal += yearly_interest
 
-        yearly_details.append({
-            "year": year,
-            "interest": yearly_interest,
-            "principal": principal
-        })
-
-    # -------------------------
-    # MONTH INTEREST
-    # -------------------------
+    # MONTHLY INTEREST
     monthly_interest = (
         principal * months * rate
     ) / 100
 
-    # -------------------------
     # DAILY INTEREST
-    # -------------------------
     daily_interest = (
         principal * days * rate
     ) / (30 * 100)
 
-    # -------------------------
     # FINAL AMOUNT
-    # -------------------------
     final_amount = (
         principal
         + monthly_interest
@@ -189,12 +216,10 @@ def calculate_village_interest(principal, rate, years, months, days):
     )
 
     return {
-        "yearly_details": yearly_details,
+        "principal_after_years": principal,
         "monthly_interest": monthly_interest,
         "daily_interest": daily_interest,
-        "final_amount": final_amount,
-        "principal_after_years": principal,
-        "original_principal": original_principal
+        "final_amount": final_amount
     }
 
 # ---------------------------------------------------
@@ -217,26 +242,11 @@ if st.button("🧮 ब्याज Calculate गर्नुहोस्"):
 
     st.subheader("📊 Result")
 
-    # -------------------------
-    # YEARLY BREAKDOWN
-    # -------------------------
-    for detail in result["yearly_details"]:
+    st.write(
+        f"🏦 Principal After {years} Year(s): "
+        f"रु. {result['principal_after_years']:,.2f}"
+    )
 
-        st.write(
-            f"Year {detail['year']} Interest: "
-            f"रु. {detail['interest']:,.2f}"
-        )
-
-        st.write(
-            f"New Principal: "
-            f"रु. {detail['principal']:,.2f}"
-        )
-
-        st.markdown("---")
-
-    # -------------------------
-    # MONTH + DAY
-    # -------------------------
     st.write(
         f"📅 Month Interest: "
         f"रु. {result['monthly_interest']:,.2f}"
